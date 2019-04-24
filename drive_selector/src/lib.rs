@@ -49,3 +49,12 @@ where
         }
     }
 }
+
+impl<T> DriveSelector for Option<T>
+where
+    T: DriveSelector,
+{
+    fn selector_with_ident(ident: &str, selector: &mut String) {
+        T::selector_with_ident(ident, selector)
+    }
+}

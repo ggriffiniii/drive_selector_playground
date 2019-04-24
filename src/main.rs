@@ -8,7 +8,7 @@ mod tests {
     struct File {
         id: String,
         mime_type: String,
-        sharing_user: UserInfo,
+        sharing_user: Option<UserInfo>,
     }
 
     #[derive(Deserialize, DriveSelector)]
