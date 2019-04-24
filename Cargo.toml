@@ -1,0 +1,13 @@
+[workspace]
+members = ["drive_selector", "drive_selector_derive"]
+
+[package]
+name = "playground"
+version = "0.1.0"
+authors = ["Glenn Griffin <ggriffiniii@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+drive_selector = { path = "./drive_selector", "version" = "0.1.0" }
+drive_selector_derive = { path = "./drive_selector_derive", "version" = "0.1.0" }
