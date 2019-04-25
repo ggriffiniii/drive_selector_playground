@@ -1,18 +1,20 @@
-use std::path::Path;
 use std::error::Error;
-  
+use std::path::Path;
+
 use hyper::net::HttpsConnector;
 use hyper_native_tls::NativeTlsClient;
 
-use yup_oauth2::{Authenticator, FlowType, ApplicationSecret, DiskTokenStorage,
-                 DefaultAuthenticatorDelegate, read_application_secret};
-use google_drive3 as gdrive;
-use serde::{Deserialize, de::DeserializeOwned};
-use drive_selector::DriveSelector;
 use chrono::{DateTime, Utc};
+use drive_selector::DriveSelector;
+use google_drive3 as gdrive;
+use serde::{de::DeserializeOwned, Deserialize};
 use std::collections::{HashMap, HashSet};
+use yup_oauth2::{
+    read_application_secret, ApplicationSecret, Authenticator, DefaultAuthenticatorDelegate,
+    DiskTokenStorage, FlowType,
+};
 
-#[derive(Debug,Deserialize,DriveSelector)]
+#[derive(Debug, Deserialize, DriveSelector)]
 #[serde(rename_all = "camelCase")]
 struct FileAttrs {
     id: String,
@@ -26,7 +28,7 @@ struct FileAttrs {
     permission_ids: HashSet<String>,
 }
 
-#[derive(Debug,Deserialize, DriveSelector,PartialEq,Eq,Hash)]
+#[derive(Debug, Deserialize, DriveSelector, PartialEq, Eq, Hash)]
 #[serde(rename_all = "camelCase")]
 struct UserInfo {
     me: bool,
@@ -41,21 +43,24 @@ fn main() {
     }
 }
 
-type Drive = gdrive::Drive<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, DiskTokenStorage, hyper::Client>>;
+type Drive = gdrive::Drive<
+    hyper::Client,
+    Authenticator<DefaultAuthenticatorDelegate, DiskTokenStorage, hyper::Client>,
+>;
 
 fn initialize_gdrive() -> Result<Drive, Box<Error>> {
     // Get an ApplicationSecret instance by some means. It contains the `client_id` and
     // `client_secret`, among other things.
     let secret: ApplicationSecret = read_application_secret(Path::new("credentials.json"))?;
-    let client = hyper::Client::with_connector(
-        HttpsConnector::new(NativeTlsClient::new()?));
-    let authenticator = Authenticator::new(&secret,
-                                           DefaultAuthenticatorDelegate,
-                                           client,
-                                           DiskTokenStorage::new(&"token_store.json".to_string())?,
-                                           Some(FlowType::InstalledInteractive));
-    let client = hyper::Client::with_connector(
-        HttpsConnector::new(NativeTlsClient::new()?));
+    let client = hyper::Client::with_connector(HttpsConnector::new(NativeTlsClient::new()?));
+    let authenticator = Authenticator::new(
+        &secret,
+        DefaultAuthenticatorDelegate,
+        client,
+        DiskTokenStorage::new(&"token_store.json".to_string())?,
+        Some(FlowType::InstalledInteractive),
+    );
+    let client = hyper::Client::with_connector(HttpsConnector::new(NativeTlsClient::new()?));
     Ok(gdrive::Drive::new(client, authenticator))
 }
 
@@ -63,12 +68,21 @@ fn list_files<T>(drive: &Drive, page_size: i32) -> Result<Vec<T>, Box<Error>>
 where
     T: DriveSelector + DeserializeOwned,
 {
-    #[derive(Debug,Deserialize,DriveSelector)]
+    #[derive(Debug, Deserialize, DriveSelector)]
     #[serde(rename_all = "camelCase")]
-    struct ListResponse<T> where T: DriveSelector {
+    struct ListResponse<T>
+    where
+        T: DriveSelector,
+    {
         files: Vec<T>,
     }
-    let response: ListResponse<T> = drive.files().list().page_size(page_size).add_scope("https://www.googleapis.com/auth/drive").q("sharedWithMe=true").doit()?;
+    let response: ListResponse<T> = drive
+        .files()
+        .list()
+        .page_size(page_size)
+        .add_scope("https://www.googleapis.com/auth/drive")
+        .q("sharedWithMe=true")
+        .doit()?;
     Ok(response.files)
 }
 

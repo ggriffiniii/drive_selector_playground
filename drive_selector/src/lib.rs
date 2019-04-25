@@ -31,7 +31,7 @@ impl DriveSelector for bool {
     }
 }
 
-impl<K,V> DriveSelector for HashMap<K,V> {
+impl<K, V> DriveSelector for HashMap<K, V> {
     fn selector_with_ident(ident: &str, selector: &mut String) {
         match selector.chars().last() {
             Some(',') | None => {}
@@ -94,7 +94,10 @@ where
 mod chrono {
     use super::DriveSelector;
 
-    impl<T> DriveSelector for chrono::DateTime<T> where T: chrono::offset::TimeZone {
+    impl<T> DriveSelector for chrono::DateTime<T>
+    where
+        T: chrono::offset::TimeZone,
+    {
         fn selector_with_ident(ident: &str, selector: &mut String) {
             match selector.chars().last() {
                 Some(',') | None => {}
@@ -104,4 +107,3 @@ mod chrono {
         }
     }
 }
-
