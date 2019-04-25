@@ -1,5 +1,5 @@
 [workspace]
-members = ["drive_selector", "drive_selector_derive"]
+members = ["drive_selector", "drive_selector_derive", "google-apis-rs/gen/drive3"]
 
 [package]
 name = "playground"
@@ -11,3 +11,8 @@ edition = "2018"
 serde = { version = "1.0", features = ["derive"] }
 drive_selector = { path = "./drive_selector", "version" = "0.1.0" }
 drive_selector_derive = { path = "./drive_selector_derive", "version" = "0.1.0" }
+google-drive3 = { path = "google-apis-rs/gen/drive3", version = "^ 1.0" }
+yup-oauth2 = "^ 1.0"
+hyper = "^ 0.10"
+hyper-native-tls = "0.3"
+chrono = { version = "0.4", features = ["serde"] }

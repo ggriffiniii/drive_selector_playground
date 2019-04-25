@@ -1,4 +1,5 @@
 pub use drive_selector_derive::DriveSelector;
+use std::collections::HashMap;
 
 pub trait DriveSelector {
     fn selector() -> String {
@@ -21,6 +22,16 @@ impl DriveSelector for String {
 }
 
 impl DriveSelector for bool {
+    fn selector_with_ident(ident: &str, selector: &mut String) {
+        match selector.chars().last() {
+            Some(',') | None => {}
+            _ => selector.push_str(","),
+        }
+        selector.push_str(ident);
+    }
+}
+
+impl<K,V> DriveSelector for HashMap<K,V> {
     fn selector_with_ident(ident: &str, selector: &mut String) {
         match selector.chars().last() {
             Some(',') | None => {}
@@ -58,3 +69,19 @@ where
         T::selector_with_ident(ident, selector)
     }
 }
+
+#[cfg(feature = "chrono")]
+mod chrono {
+    use super::DriveSelector;
+
+    impl<T> DriveSelector for chrono::DateTime<T> where T: chrono::offset::TimeZone {
+        fn selector_with_ident(ident: &str, selector: &mut String) {
+            match selector.chars().last() {
+                Some(',') | None => {}
+                _ => selector.push_str(","),
+            }
+            selector.push_str(ident);
+        }
+    }
+}
+

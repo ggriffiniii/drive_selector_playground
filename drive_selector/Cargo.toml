@@ -4,5 +4,9 @@ version = "0.1.0"
 authors = ["Glenn Griffin <ggriffiniii@gmail.com>"]
 edition = "2018"
 
+[features]
+default = ["chrono"]
+
 [dependencies]
 drive_selector_derive = { path = "../drive_selector_derive", "version" = "0.1.0" }
+chrono = { version = "0.4", optional = true }
