@@ -10,7 +10,7 @@ use google_drive3 as gdrive;
 use serde::{Deserialize, de::DeserializeOwned};
 use drive_selector::DriveSelector;
 use chrono::{DateTime, Utc};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 #[derive(Debug,Deserialize,DriveSelector)]
 #[serde(rename_all = "camelCase")]
@@ -21,9 +21,12 @@ struct FileAttrs {
     viewed_by_me_time: Option<DateTime<Utc>>,
     #[serde(default)]
     export_links: HashMap<String, String>,
+    owners: HashSet<UserInfo>,
+    #[serde(default)]
+    permission_ids: HashSet<String>,
 }
 
-#[derive(Debug,Deserialize, DriveSelector)]
+#[derive(Debug,Deserialize, DriveSelector,PartialEq,Eq,Hash)]
 #[serde(rename_all = "camelCase")]
 struct UserInfo {
     me: bool,
